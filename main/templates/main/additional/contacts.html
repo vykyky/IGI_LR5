@@ -1,0 +1,46 @@
+{% extends "main/base.html" %}
+
+{% block title %}
+    Контакты
+{% endblock %}
+
+{% block content %}
+    <h1>Контакты</h1>
+
+    <form method="get" action="{% url 'main:contacts' %}">
+        <label for="search_field">Искать по:</label>
+        <select id="search_field" name="search_field">
+            <option value="last_name" {% if request.GET.search_field == 'last_name' %}selected{% endif %}>Фамилия</option>
+            <option value="first_name" {% if request.GET.search_field == 'first_name' %}selected{% endif %}>Имя</option>
+            <option value="category" {% if request.GET.search_field == 'category' %}selected{% endif %}>Категория</option>
+            <option value="specialization" {% if request.GET.search_field == 'specialization' %}selected{% endif %}>Специализация</option>
+        </select>
+
+        <label for="search_value">Значение:</label>
+        <input type="text" id="search_value" name="search_value" value="{{ request.GET.search_value }}">
+
+        <button type="submit">Поиск</button>
+
+        {% if request.GET.search_value %}
+            <a href="{% url 'main:contacts' %}" style="margin-left:10px;">Сбросить</a>
+        {% endif %}
+    </form>
+
+    {% for item in department_data %}
+        <h2>{{ item.department.name }} (Этаж: {{ item.department.floor }}, №{{ item.department.number }})</h2>
+
+        {% for doctor in item.doctors %}
+            <div style="margin-left: 20px; margin-bottom: 20px;">
+                <h3>Врач: {{ doctor.user.full_name }}</h3>
+                <p>Специализация: {{ doctor.specialization.name }}</p>
+                <p>Категория: {{ doctor.category.name }}</p>
+                <p>Телефон: {{ doctor.user.telephone }}</p>
+                <p>Email: {{ doctor.user.email }}</p>
+                <p>Дата рождения: {{ doctor.birth_date|date:"d.m.Y" }}</p>
+                {% if doctor.image %}
+                    <p><img src="{{ doctor.image.url }}" alt="Doctor image" width="200"/></p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% endfor %}
+{% endblock %}

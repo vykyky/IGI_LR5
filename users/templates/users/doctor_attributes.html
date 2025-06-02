@@ -1,0 +1,35 @@
+{% extends "main/base.html" %}
+
+{% block content %}
+    <h1>Специализации врачей</h1>
+    {% if user.is_superuser %}
+        <li><a href="{% url 'users:add_doctor_specialization' %}">Добавить специализацию</a></li>
+    {% endif %}
+    
+    {% for specialization in doctor_specializations %}
+        <div >
+            <h3>{{ specialization.name }}</h3>
+            <p>Зарплата: {{ specialization.salary }}</p>
+            <p>Описание: {{ specialization.description }}</p>
+            {% if user.is_superuser %}
+                <a href="{{ specialization.get_absolute_url_for_delete }}">Удалить</a>
+                <a href="{{ specialization.get_absolute_url_for_update}}">Редактировать</a>
+            {% endif %}
+        </div>
+    {% endfor %}
+    <h1>Категории врачей</h1>
+    {% if user.is_superuser %}
+        <li><a href="{% url 'users:add_doctor_category' %}">Добавить категорию</a></li>
+    {% endif %}
+    
+    {% for category in doctor_categories %}
+        <div >
+            <h3>{{ category.name }}</h3>
+            <p>Перерасчетный коэффициент: {{ category.salary_multiplier }}</p>
+            {% if user.is_superuser %}
+                <a href="{{ category.get_absolute_url_for_delete }}">Удалить</a>
+                <a href="{{ category.get_absolute_url_for_update}}">Редактировать</a>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% endblock %}

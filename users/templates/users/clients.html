@@ -1,0 +1,94 @@
+{% extends "main/base.html" %}
+
+{% block content %}
+    <h1>Клиенты</h1>
+
+    <form method="get">
+        <label for="client-select">Выберите клиента:</label>
+        <select name="client_id" id="client-select" onchange="this.form.submit()">
+            <option value="">Все клиенты</option>
+            {% for client in clients %}
+                <option value="{{ client.id }}" {% if selected_client and client.id == selected_client.id %}selected{% endif %}>
+                    {{ client.user.full_name }}
+                </option>
+            {% endfor %}
+        </select>
+        {% if selected_client %}
+            <button type="submit" name="client_id" value="">Очистить фильтр</button>
+        {% endif %}
+    </form>
+
+    {% if selected_client %}
+        <div style="margin-top: 20px;">
+            <p><strong>Клиент:</strong> {{ selected_client.user.full_name }}</p>
+            <p>Email: {{ selected_client.user.email }}</p>
+            <p>Телефон: {{ selected_client.user.telephone }}</p>
+            <p>Имя пользователя: {{ selected_client.user.username }}</p>
+            <p>Адрес: {{ selected_client.address }}</p>
+             {% if appointments %}
+                <p><strong>Планируемые посещения:</strong></p>
+                <ul>
+                    {% for appt in appointments %}
+                        <li>
+                            Услуга: {{ appt.service.name }} ({{ appt.service.price }} руб.)<br>
+                            Врач: {{ appt.doctor.user.full_name }}<br>
+                            Дата: {{ appt.scheduled_time.start_time|date:"d.m.Y H:i" }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Нет запланированных посещений.</p>
+            {% endif %}
+            <form method="get">
+                <input type="hidden" name="client_id" value="{{ selected_client.id }}">
+                
+                <label for="date_start">С:</label>
+                <input type="date" name="date_start" id="date_start" value="{{ selected_start }}">
+                
+                <label for="date_end">По:</label>
+                <input type="date" name="date_end" id="date_end" value="{{ selected_end }}">
+                
+                <button type="submit">Применить</button>
+                
+                {% if selected_start or selected_end %}
+                    <a href="?client_id={{ selected_client.id }}">Очистить фильтр</a>
+                {% endif %}
+            </form>
+
+            {% if grouped_appointments %}
+                <h3>Посещения по врачам {{ selected_start|date:"d.m.Y" }} - {{ selected_end|date:"d.m.Y" }}</h3>
+        
+                {% for doctor, data in grouped_appointments.items %}
+                    <div >
+                        <h4>Врач: {{ doctor }} (Итого: {{ data.total_price }} руб.)</h4>
+                        <ul>
+                            {% for appt in data.appointments %}
+                                <li>
+                                    Услуга: {{ appt.service.name }} ({{ appt.service.price }} руб.)<br>
+                                    Дата: {{ appt.scheduled_time.start_time|date:"d.m.Y H:i" }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endfor %}
+
+                <h4>Общая сумма за период: {{ total_sum }} руб.</h4>
+            {% else %}
+                <p>Нет запланированных посещений.</p>
+            {% endif %}
+
+            <a href="{{ selected_client.user.get_absolute_url_for_delete }}">Удалить</a>
+        </div>
+    {% else %}
+        {% for client in clients %}
+            <div style="margin-bottom: 30px;">
+                <p><strong>Клиент:</strong> {{ client.user.full_name }}</p>
+                <p>Email: {{ client.user.email }}</p>
+                <p>Телефон: {{ client.user.telephone }}</p>
+                <p>Имя пользователя: {{ client.user.username }}</p>
+                <p>Адрес: {{ client.address }}</p>
+                <a href="{{ client.user.get_absolute_url_for_delete }}">Удалить</a>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endblock %}

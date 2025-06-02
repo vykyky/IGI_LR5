@@ -1,0 +1,30 @@
+{% extends "main/base.html" %}
+
+{% block title %}
+    Вакансии
+{% endblock %}
+
+{% block content %}
+    <h1>Наши вакансии</h1>
+    
+    {% if user.is_superuser%}
+        <li><a href="{% url 'main:add_vacancy' %}">Добавить вакансию</a></li>
+    {% endif %}
+    
+    {% for vacancy in vacancies %}
+        <h2>{{ vacancy.doctor_specialization.name }}</h2>
+        <h3>
+            {% if vacancy.doctor_category %}
+                Категория врача: {{ vacancy.doctor_category.name }}
+            {% else %}
+                Категория врача не важна
+            {% endif %}
+        </h3>
+        <p>Количество мест: {{ vacancy.number_of_this_position }}</p>
+        <p>{{ vacancy.vacancy_description }}</p>
+        {% if perms.vacancy.add_vacancy %}
+            <a href="{{ vacancy.get_absolute_url_for_delete }}">Удалить</a>
+            <a href="{{ vacancy.get_absolute_url_for_update}}">Редактировать</a>
+        {% endif %}
+    {% endfor %}
+{% endblock %}

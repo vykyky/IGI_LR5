@@ -1,0 +1,17 @@
+{% extends "main/base.html" %}
+
+{% block title %}
+    Вход в аккаунт
+{% endblock %}
+
+{% block content %}
+    <form method="post">
+        {% csrf_token %} 
+        {{ form.as_p }}
+        <p><button type="submit">Sign in</button></p>
+    </form>
+
+    <hr>
+    <p>Или войдите через:</p>
+    <a href="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}">Войти через Google</a>
+{% endblock %}

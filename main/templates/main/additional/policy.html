@@ -1,0 +1,17 @@
+{% extends "main/base.html" %}
+
+{% block title %}
+    Политика конфиденциальности
+{% endblock %}
+
+{% block content %}
+    <h2>Рандомный факт о котах:</h2>
+    <p>{{ cat_fact }}</p>
+
+    {% if random_image_url %}
+        <div class="random-image" style="margin-top: 20px;">
+            <h2>Рандомная картинка собаки:</h2>
+            <img src="{{ random_image_url }}" alt="Random image" width="200"/>
+        </div>
+    {% endif %}
+{% endblock %}

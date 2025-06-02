@@ -1,0 +1,17 @@
+{% extends "main/base.html" %}
+
+{% block title %}
+    Новости
+{% endblock %}
+
+{% block content %}
+    <h1>Новости</h1>
+    {% for news_info in news %}
+        <div >
+            <h2>{{ news_info.title }}</h2>
+            <p>{{ news_info.content }}</p>
+            <img src="{{ news_info.image_source.url }}" alt="News image" width="200"/>
+            <p>{{ news_info.date }}</p>
+        </div>
+    {% endfor %}
+{% endblock %}

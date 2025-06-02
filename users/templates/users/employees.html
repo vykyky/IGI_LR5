@@ -1,0 +1,37 @@
+{% extends "main/base.html" %}
+
+{% block content %}
+    <h1>Employees</h1>
+
+    {% if user.is_superuser %}
+        <li><a href="{% url 'add_employee' %}">Add employee</a></li>
+    {% endif %}
+
+    <form method="GET" action="">
+        <label for="hall_filter">Filter by hall:</label>
+        <select name="hall_filter" id="hall_filter">
+            <option value="">All halls</option>
+            {% for hall in all_halls %}
+                <option value="{{ hall.id }}">{{ hall.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Filter</button>
+    </form>
+
+    {% if employees %}
+        {% for employee in employees %}
+            <div>
+                <p>Employee's name: {{ employee.user.last_name }} {{ employee.user.first_name }}</p>
+                <p>Employee's email: {{ employee.user.email }}</p>
+                <p>Employee's hall: {{ employee.hall }}</p>
+                <p>Employee's job: {{ employee.job.name }}</p>
+                <p>Employee's photo:  <img src="{{ employee.image_source.url }}"  width="200"/> </p>
+                {% if user.is_superuser %}
+                    <a href="{{ employee.user.get_absolute_url_for_delete }}">Delete</a>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No employees found.</p>
+    {% endif %}
+{% endblock %}

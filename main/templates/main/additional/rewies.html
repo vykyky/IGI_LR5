@@ -1,0 +1,29 @@
+{% extends "main/base.html" %}
+
+{% block title %}
+    Отзывы
+{% endblock %}
+
+{% block content %}
+    {% if not user.is_staff %}
+        <h2>Добавить отзыв</h2>
+        <form method="post">
+            {% csrf_token %} 
+            {{ form.as_p }}
+            <p><button type="submit">Добавить</button></p>
+        </form>
+    {% endif %}
+    
+    <h1>Отзывы</h1>
+    {% for review in reviews %}
+        <div>
+            <p>Оценка: {{ review.rate }}</p>
+            <div style="margin-left:20px;">
+                <p>{{ review.content }}</p>
+                <p><small>{{ review.author.user.username }}</small></p>
+                <p><small>{{ review.date }}</small></p>
+            </div>
+            
+        </div>
+    {% endfor %}
+{% endblock %}

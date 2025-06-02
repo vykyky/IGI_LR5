@@ -1,0 +1,98 @@
+{% extends "main/base.html" %}
+
+{% block content %}
+    <h1>Личная информация</h1>
+    <p>Фамилия: {{ current_user.user.last_name }}</p>
+    <p>Имя: {{ current_user.user.first_name }}</p>
+    <p>Отчество: {{ current_user.user.patronymic }}</p>
+    <p>Email: {{ current_user.user.email }}</p>
+    <p>Телефон: {{ current_user.user.email }}</p>
+    <p>Имя пользователя: {{ current_user.user.username}}</p>
+
+    {% if user.is_staff %}
+        <p>Дата рождения: {{ current_user.birth_date|date:"d.m.Y" }}</p>
+        <p>Отделение: {{ current_user.department }}</p>
+        <p>Специализация: {{ current_user.specialization }}</p>
+        <p>Категория: {{ current_user.category }}</p>
+        <img src="{{ current_user.image.url }}" alt="Profile image" width="200"/>
+    {% else %}
+    <p>Дата рождения: {{ current_user.birth_date|date:"d.m.Y" }}</p>
+        <p>Адрес: {{ current_user.address }}</p>
+    {% endif %}
+
+    <h2>Данные о часовом поясе</h2>
+    <!-- <p>Часовой пояс пользователя: {{ user_timezone }}</p> -->
+    <!-- <p>Время пользователя: {{ current_date_formatted }}</p> -->
+    <p>Часовой пояс пользователя: <span id="tz-name"></span></p>
+    <p>Время пользователя: <span id="local-time"></span></p>
+    <pre>Календарь: {{ calendar_text }}</pre>
+    <p>UTC: {{ utc_time }}</p>
+    {% if user.is_staff %}
+        <h3>Ваши услуги:</h3>
+        <ul>
+        {% for service in service_for_doctor %}
+            <li>{{ service.name }} — {{ service.price }} BYN</li>
+        {% endfor %}
+        </ul>
+
+        <h3>Ваше расписание:</h3>
+        <ul>
+        {% for time in schedule %}
+            <li>{{ time.start_time }} — {{ time.end_time }}</li>
+        {% endfor %}
+        </ul>
+
+        <h3>Записи клиентов:</h3>
+        <table>
+        <thead>
+            <tr>
+            <th>Клиент</th>
+            <th>Услуга</th>
+            <th>Время</th>
+            <th>Цена</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for app in appointments %}
+            <tr>
+                <td>
+                    {{ app.user.user.full_name }}<br>
+                    <small>{{ app.user.user.telephone }}</small>
+                </td>
+                <td>{{ app.service.name }}</td>
+                <td>{{ app.scheduled_time.start_time }}</td>
+                <td>{{ app.service.price }} BYN</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+
+        <h4>Общая стоимость всех записей: {{ total_income }} BYN</h4>
+    {% endif %}
+
+
+    {% if not user.is_staff %}
+        <h2>Ваши записи:</h2>
+
+        {% if appointments %}
+            <ul>
+                {% for appt in appointments %}
+                    <li>
+                        <strong>{{ appt.service.name }}</strong><br>
+                        Врач: {{ appt.doctor }}<br>
+                        Время: {{ appt.scheduled_time.start_time|date:"d.m.Y H:i" }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>У вас пока нет записей.</p>
+        {% endif %}
+    
+    {% endif %}
+
+    <script>
+        const now = new Date();
+        document.getElementById("tz-name").innerText = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        document.getElementById("local-time").innerText = now.toLocaleString('ru-RU');
+    </script>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends "main/base.html" %}
+
+{% block title %}{{ service.name }}{% endblock %}
+
+{% block content %}
+<div class="service-detail">
+
+    <img src="{{ service.image.url }}" alt="{{ service.name }}" width="300">
+
+    <h1>{{ service.name }}</h1>
+    <p class="price">{{ service.price }} руб.</p>
+    <p>Категория:
+        <a href="{{ service.category.get_absolute_url }}">
+            {{ service.category.name }}
+        </a>
+    </p>
+
+    <div class="description">
+        <h3>Описание</h3>
+        <p>{{ service.description|linebreaks }}</p>
+    </div>
+    {% if user.is_superuser %}
+        <div class="admin-actions" style="margin-top: 20px;">
+            <a href="{{ service.get_absolute_url_for_update }}" >Редактировать</a>
+            <a href="{{ service.get_absolute_url_for_delete }}" >Удалить</a>
+        </div>
+    {% endif %}
+    <div class="booking-form">
+        {% if user.is_authenticated and not user.is_staff %}
+            <form method="get">
+                <label for="doctor_id">Выберите врача:</label>
+                <select name="doctor_id" id="doctor_id" onchange="this.form.submit()">
+                    <option value="">-- выбрать --</option>
+                    {% for doctor in doctors %}
+                        <option value="{{ doctor.id }}" {% if selected_doctor and doctor.id == selected_doctor.id %}selected{% endif %}>
+                            {{ doctor.user.full_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </form>
+
+            <!-- Форма выбора времени (только после выбора врача) -->
+            {% if selected_doctor %}
+                <form action="{% url 'cart:cart_add' service.id %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="doctor" value="{{ selected_doctor.id }}">
+
+                    <label for="available_time">Выберите время:</label>
+                    {% if available_times %}
+                        <select name="available_time" id="available_time" required>
+                            <option value="">выбрать</option>
+                        
+                            {% for time in available_times %}
+                                <option value="{{ time.id }}">
+                                    {{ time.start_time|date:"d.m H:i" }}
+                                </option>
+                            {% endfor %}
+                            
+                        </select>
+                        
+                        <input type="hidden" name="override" value="false">
+                        <button type="submit">Добавить в корзину</button>
+                    {% else %}
+                        <p>Нет доступных дат</p>
+                    {% endif %}
+                    
+                </form>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    {% if related_services %}
+        <h2>Похожие услуги</h2>
+        <div class="related-services">
+            {% for service in related_services %}
+                <div class="related-item">
+                    <a href="{{ service.get_absolute_url }}">
+                        <img src="{{ service.image.url }}" alt="{{ service.name }}" width="200">
+                        <div>{{ service.name }}</div>
+                        <div>{{ service.price }} руб.</div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

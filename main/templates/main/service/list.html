@@ -1,0 +1,81 @@
+{% extends "main/base.html" %}
+
+{% block title %}
+    {% if category %}{{ category.name }}{% else %}Услуги{% endif %}
+{% endblock %}
+
+{% block content %}
+    <div>
+        <label for="category-select">Категория:</label>
+        <select id="category-select" onchange="location = this.value;">
+            <option value="{% url 'main:service_list' %}">Все категории</option>
+            {% for cat in categories %}
+                <option value="{{ cat.get_absolute_url }}"
+                    {% if category and category.slug == cat.slug %}selected{% endif %}>
+                    {{ cat.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    {% if request.user.is_superuser %}
+        <p></p>
+        <li><a href="{% url 'main:add_category' %}">Добавить категорию</a> </li>
+     
+    {% endif %}
+    <div>
+        <h1>{% if category %}{{ category.name }}{% else %}Все Услуги{% endif %}</h1>
+        {% if request.user.is_superuser %}
+               
+                    {% if category %}
+                        <a href="{% url 'main:add_service' category.slug %}"> Добавить услугу в эту категорию</a>
+                        <p></p>
+                    {% else %}
+                        <a href="{% url 'main:add_service' 'all' %}">Добавить услугу</a>
+                        <p></p>
+                    {% endif %}
+               
+        {% endif %}
+        <div>
+            <label for="sort-options">Сортировка:</label>
+            <select id="sort-options" onchange="location = this.value;">
+                <option value="{% if category %}{{ category.get_absolute_url }}{% else %}{% url 'main:service_list' %}{% endif %}?sort=name"
+                    {% if sort == 'name' %}selected{% endif %}>
+                    По названию (А-Я)
+                </option>
+                <option value="{% if category %}{{ category.get_absolute_url }}{% else %}{% url 'main:service_list' %}{% endif %}?sort=-name"
+                    {% if sort == '-name' %}selected{% endif %}>
+                    По названию (Я-А)
+                </option>
+                <option value="{% if category %}{{ category.get_absolute_url }}{% else %}{% url 'main:service_list' %}{% endif %}?sort=price"
+                    {% if sort == 'price' %}selected{% endif %}>
+                    По цене (дешевые)
+                </option>
+                <option value="{% if category %}{{ category.get_absolute_url }}{% else %}{% url 'main:service_list' %}{% endif %}?sort=-price"
+                    {% if sort == '-price' %}selected{% endif %}>
+                    По цене (дорогие)
+                </option>
+            </select>
+        </div>
+    </div>
+    
+    {% if not services %}
+        <div>Услуги в этой категории отсутствуют</div>
+    {% else %}
+        <div>
+            {% for service in services %}
+                <div style="border: 1px solid #ccc; margin: 10px 0; padding: 10px;">
+                    <a href="{{ service.get_absolute_url }}">
+                        <img src="{{ service.image.url }}" alt="{{ service.name }}" width="200">
+                    </a>
+                    <div>
+                        <h5>
+                            <a href="{{ service.get_absolute_url }}">{{ service.name }}</a>
+                        </h5>
+                        <p>{{ service.price }} руб.</p>
+                        <a href="{{ service.get_absolute_url }}">Подробнее</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "main/base.html" %}
+
+{% block content %}
+    
+    <div class="features">
+        <h1>Главная</h1>
+        <h2>{{ latest_news.title }}</h2>
+        <p>{{ latest_news.content }}</p>
+        <img src="{{ latest_news.image_source.url }}" alt="News image" width="200"/>
+    </div>
+{% endblock %}

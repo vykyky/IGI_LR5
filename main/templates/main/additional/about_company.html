@@ -1,0 +1,86 @@
+{% extends "main/base.html" %}
+
+{% block title %}
+    О нас
+{% endblock %}
+
+{% block content %}
+        <div class="features">
+        <h1>О нас</h1>
+        <p>Профессионалы в своем деле</p>
+    {% if company %}
+        <h2>{{ company.name }}</h2>
+        {% if company.logo %}
+            <img src="{{ company.logo.url }}" alt="Logo" width="200">
+        {% endif %}
+        {% if company.video %}
+            <video controls>
+                <source src="{{ company.video.url }}" type="video/mp4">
+                Ваш браузер не поддерживает видео.
+            </video>
+        {% endif %}
+        <h3>История компании:</h3>
+        <ul>
+            {% for story in stories %}
+                <li>
+                    <strong>{{ story.title }}</strong> ({{ story.date }})<br>
+                    {{ story.content }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if user.is_superuser %}
+        <h1>Статистика</h1>
+        <h2>Статистика клиентов:</h2>
+        <p>Медиана возрастов клиентов: {{ client_age_median }}</p>
+        <p>Средний возраст клиентов: {{ client_age_mean }}</p>
+        
+        <h2>Статистика продаж:</h2>
+        <p>Общая сумма продаж: {{ total_sales_sum }} руб.</p>
+        <p>Средняя сумма продажи: {{ sales_mean }} руб.</p>
+        <p>Медиана суммы продажи: {{ sales_median }} руб.</p>
+        <p>Мода суммы продажи: {{ sales_mode|default:"Нет уникальной моды" }}</p>
+
+        <h2>Статистика услуг</h2>
+        <p>Наиболее популярная категория услуг: {{ most_popular_service_category }}</p>
+        <p>Категория услуг с наибольшей прибылью: {{ most_profitable_service_category }}</p>
+        <p>Наиболее популярная услуга: {{ most_popular_service }}</p>
+        <p>Услуга с максимальной прибылью: {{ service_with_max_profit }}</p>
+        
+        {% if appointments_per_month_plot %}
+            <h3>Записи по месяцам </h3>
+            <img src="data:image/png;base64,{{ appointments_per_month_plot }}" alt="Диаграмма записей по месяцам" />
+        
+        {% endif %}
+
+        {% if reviews_plot %}
+            <h3>Распределение оценок в отзывах </h3>
+            <img src="data:image/png;base64,{{ reviews_plot }}" alt="Распределение оценок">
+       
+        {% endif %}
+
+        {% if appointments_per_doctor_plot  %}
+            <img src="data:image/png;base64,{{ appointments_per_doctor_plot }}" alt="Записи по врачам">
+
+        {% endif %}
+
+        <h2>Список клиентов (в алфавитном порядке):</h2>
+            <ul>
+                {% for client in clients_sorted %}
+                    <li>{{ client.user.full_name }} ({{ client.user.email }})</li>
+                {% empty %}
+                    <li>Нет зарегистрированных клиентов.</li>
+                {% endfor %}
+            </ul>
+        <h2>Список доступных услуг (в алфавитном порядке):</h2>
+            <ul>
+                {% for service in services_sorted %}
+                    <li>{{ service.name }} — {{ service.price }} руб.</li>
+                {% empty %}
+                    <li>Нет доступных услуг.</li>
+                {% endfor %}
+            </ul>
+    {% endif %}
+            </div>
+{% endblock %}

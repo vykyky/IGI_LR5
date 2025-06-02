@@ -1,0 +1,103 @@
+{% extends "main/base.html" %}
+
+{% block content %}
+    <h1>Врачи</h1>
+
+    {% if user.is_superuser %}
+        <li><a href="{% url 'users:add_doctor' %}">Добавить врача</a></li>
+    {% endif %}
+
+    <p></p>
+    {% if user.is_superuser %}
+        <form method="get">
+            <label for="doctor-select">Выберите врача:</label>
+            <select name="doctor_id" id="doctor-select" onchange="this.form.submit()">
+                <option value="">Все врачи</option>
+                {% for doctor in doctors %}
+                    <option value="{{ doctor.id }}" {% if selected_doctor and doctor.id == selected_doctor.id %}selected{% endif %}>
+                        {{ doctor.user.full_name }}
+                    </option>
+                {% endfor %}
+            </select>
+            {% if selected_doctor %}
+                <button type="submit" name="doctor_id" value="">Очистить фильтр</button>
+            {% endif %}
+        </form>
+    {% endif %}
+    {% if selected_doctor %}
+        <div>
+            <h2>Врач: {{ selected_doctor.user.full_name }}</h2>
+            <p>Специализация: {{ selected_doctor.specialization.name }}</p>
+            <p>Категория: {{ selected_doctor.category.name }}</p>
+            <p>Телефон: {{ selected_doctor.user.telephone }}</p>
+            <p>Email: {{ selected_doctor.user.email }}</p>
+            <p>Отделение: {{ selected_doctor.department.name }}</p>
+
+            {% if selected_doctor.services.exists %}
+                <p><strong>Услуги:</strong></p>
+                <ul>
+                    {% for service in selected_doctor.services.all %}
+                        <li>{{ service.name }} — {{ service.price }} руб.</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if selected_doctor.image %}
+                <img src="{{ selected_doctor.image.url }}" alt="Фото доктора" width="200">
+            {% else %}
+                <p>Фото не загружено</p>
+            {% endif %}
+
+            {% if user.is_superuser %}
+                <a href="{{ selected_doctor.get_absolute_url_for_delete }}">Удалить</a>
+                <a href="{{ selected_doctor.get_absolute_url_for_update }}">Редактировать</a>
+            {% endif %}
+
+            <h3>Пациенты:</h3>
+            <form method="get">
+                <input type="hidden" name="doctor_id" value="{{ selected_doctor.id }}">
+                <label for="date">Фильтровать по дате:</label>
+                <input type="date" name="date" id="date" value="{{ selected_date }}">
+                <button type="submit">Применить</button>
+                {% if selected_date %}
+                
+                    <a href="?doctor_id={{ selected_doctor.id }}">Очистить дату</a>
+                {% endif %}
+            </form>
+            {% if appointments %}
+                <ul>
+                    {% for appt in appointments %}
+                        <li>
+                            {{ appt.user.user.full_name }} — {{ appt.service.name }} —
+                            {{ appt.scheduled_time.start_time|date:"d.m.Y H:i" }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Пациентов пока нет.</p>
+            {% endif %}
+        </div>
+
+    {% else %}
+        {% for doctor in doctors %}
+            <div>
+                <h2>Врач: {{ doctor.user.full_name }}</h2>
+                {% if doctor.image %}
+                    <img src="{{ doctor.image.url }}" alt="Фото доктора" width="200">
+                {% else %}
+                    <p>Фото не загружено</p>
+                {% endif %}
+               
+                <p>Специализация: {{ doctor.specialization.name }}</p>
+                <p>Категория: {{ doctor.category.name }}</p>
+                <p>Телефон: {{doctor.user.telephone }}</p>
+                <p>Email: {{ doctor.user.email }}</p>
+                <p>Отделение: {{ doctor.department.name }}</p>
+                
+                {% if user.is_superuser %}
+                    <a href="{{ doctor.get_absolute_url_for_delete }}">Удалить</a>
+                    <a href="{{ doctor.get_absolute_url_for_update }}">Редактировать</a>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endblock %}

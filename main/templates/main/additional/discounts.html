@@ -1,0 +1,18 @@
+{% extends "main/base.html" %}
+
+{% block title %}
+    Бонусы и промокоды
+{% endblock %}
+
+{% block content %}
+
+    <h1>Действующие промокоды</h1>
+    {% for promo_code in active_promo_codes %}
+        <h3>{{ promo_code.code }}: скидка {{ promo_code.discount_percentage }}% </h3>
+    {% endfor %}
+
+    <h1>Промокоды в архиве</h1>
+    {% for promo_code in archived_promo_codes %}
+        <h3>{{ promo_code.code }}: скидка {{ promo_code.discount_percentage }}% </h3>
+    {% endfor %}
+{% endblock %}

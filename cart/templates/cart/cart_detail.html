@@ -1,0 +1,62 @@
+{% extends "main/base.html" %}
+
+{% block title %}Корзина{% endblock %}
+
+{% block content %}
+    <h1>Ваша корзина</h1>
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <table>
+        <thead>
+            <tr>
+                <th>Услуга</th>
+                <th>Врач</th>
+                <th>Время</th>
+                <th>Удалить</th>
+                <th>Цена за единицу</th>
+                <th>Общая стоимость</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart %}
+                <tr>
+                    <td>{{ item.service.name }}</td>
+                    <td>{{ item.doctor_name }} </td>
+                    <td>{{ item.time_str }} </td>
+                    <td>
+                        <form action="{% url 'cart:cart_remove' item.key %}" method="post">
+                            <button type="submit">Удалить</button>
+                            {% csrf_token %}
+                        </form>
+                    </td>
+                    
+                    <td>{{ item.price }} руб.</td>
+                    <td>{{ item.total_price }} руб.</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">Ваша корзина пуста</td>
+                </tr>
+            {% endfor %}
+            {% if cart.get_total_price %}
+                <tr>
+                    <td colspan="5"><strong>Итого:</strong></td>
+                    <td><strong>{{ cart.get_total_price }} руб.</strong></td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+
+    <div>
+        <a href="{% url 'main:service_list' %}">Продолжить покупки</a>
+        <form action="{% url 'cart:make_order' %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit">Оформить заказ</button>
+        </form>
+    </div>
+{% endblock %}

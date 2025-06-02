@@ -1,0 +1,30 @@
+{% extends "main/base.html" %}
+
+{% block title %}
+    Часто задаваемые вопросы
+{% endblock %}
+
+{% block content %}
+    <h2>Вопросы</h2>
+    {% if not user.is_staff and not user.is_superuser %}
+      
+        <li><a href="{% url 'main:add_question' %}">Задать вопрос</a></li>
+    {% endif %}
+    
+    {% for question in questions %}
+        <div>
+            <h3>Вопрос: {{ question.content }}</h3>
+            <p>{{ question.date }}</p>
+            {% if question.answer %}
+                <div style="margin-left:20px;">
+                    <p><strong>Ответ:</strong> {{ question.answer.content }}</p>
+                    <p>{{ question.answer.date }}</p>
+                </div>
+            {% else %}
+                {% if user.is_staff %}
+                    <a style="margin-left:20px;" href="{{ question.get_absolute_url_to_add }}">Ответить</a>
+                {% endif %}
+            {% endif %}
+        </div>
+    {% endfor %}
+{% endblock %}

@@ -1,0 +1,146 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Медицинский центр{% endblock %}</title>
+    <style>
+ body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #f3f3f3;
+            padding: 1em;
+            text-align: center;
+        }
+
+        footer {
+            background-color: #f3f3f3;
+            padding: 1em;
+        }
+        main {
+            padding: 2em;
+        }
+        .navbar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .nav-left {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            padding: 0;
+            margin: 0;
+            justify-content: center;
+        }
+        .nav-links li {
+            margin: 0 0.5rem;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        .cart-button {
+            position: relative;
+        }
+
+        .cart-button a {
+            text-decoration: none;
+            color: #007BFF;
+            position: relative;
+            padding-right: 10px;
+        }
+
+        .cart-button a:hover {
+            text-decoration: underline;
+        }
+
+        .cart-count {
+            background-color: green;
+            color: white;
+            border-radius: 50%;
+            font-size: 12px;
+            padding: 2px 6px;
+            position: absolute;
+            top: -5px;
+            right: -10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="navbar">
+            <div class="nav-left">Медицинский Центр</div>
+            <ul class="nav-links">
+                <li><a href="{% url 'main:home' %}">Главная</a></li>
+                <li><a href="{% url 'main:service_list' %}">Услуги</a></li>
+                <li><a href="{% url 'main:about' %}">О нас</a></li>
+                <li><a href="{% url 'main:news' %}">Новости</a></li>
+                <li><a href="{% url 'main:dictionary' %}">Вопросы</a></li>
+                <li><a href="{% url 'main:contacts' %}">Контакты</a></li>
+                <li><a href="{% url 'main:policy' %}">Политика конфиденциальности</a></li>
+                <li><a href="{% url 'main:vacancies' %}">Вакансии</a></li>
+                <li><a href="{% url 'main:reviews' %}">Отзывы</a></li>
+                <li><a href="{% url 'main:discounts' %}">Промокоды</a></li>
+                {% if user.is_staff %}
+                    <li><a href="{% url 'users:doctors' %}">Врачи</a></li>
+                    <li><a href="{% url 'users:doctor_attributes' %}">Специализации и категории врачей</a></li>
+                    
+                {% endif %}
+                {% if user.is_superuser %}
+                    <li><a href="{% url 'users:clients' %}">Клиенты</a></li>
+                {% endif %}
+
+                {% if user.is_authenticated %}
+                    {% if not user.is_superuser %}
+                        {% if user.is_staff %}
+                           <a href="{% url 'main:doctor_profile' %}">Профиль</a>
+                        {% else %}
+
+                            <div class="cart-button">
+                                <li><a href="{% url 'cart:cart_detail' %}">
+                                    Корзина
+                                    <span class="cart-count">
+                                        {% with total_items=cart|length %}
+                                            {{ total_items }}
+                                        {% endwith %}
+                                    </span>
+                                </li></a>
+                            </div>
+                            <a href="{% url 'main:client_profile' %}">Профиль</a>
+                        {% endif %}
+                    {% endif %}
+                    <li><a href="{% url 'users:logout' %}">Выйти</a></li>
+                {% else %}
+                    <li><a href="{% url 'users:login' %}">Войти</a></li>
+                    <li><a href="{% url 'users:register' %}">Зарегистрироваться</a></li>
+                {% endif %}
+                
+            </ul>
+            
+        </div>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>© {{ now|date:"Y" }} Медицинский Центр</p>
+    </footer>
+
+</body>
+</html>
